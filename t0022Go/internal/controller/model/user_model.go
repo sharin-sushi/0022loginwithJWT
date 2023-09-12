@@ -4,11 +4,11 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/sharin-sushi/0022loginwithJWT/t0016Go/internal/controller/crypto"
+	"github.com/sharin-sushi/0022loginwithJWT/t0022Go/internal/controller/crypto"
 
-	"github.com/sharin-sushi/0022loginwithJWT/t0016Go/internal/types"
+	"github.com/sharin-sushi/0022loginwithJWT/t0022Go/internal/types"
 
-	"github.com/sharin-sushi/0022loginwithJWT/t0016Go/internal/utility"
+	"github.com/sharin-sushi/0022loginwithJWT/t0022Go/internal/utility"
 
 	_ "github.com/go-sql-driver/mysql"
 )

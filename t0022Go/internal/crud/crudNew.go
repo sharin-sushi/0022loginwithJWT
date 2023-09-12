@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sharin-sushi/0022loginwithJWT/t0016Go/internal/types"
+	"github.com/sharin-sushi/0022loginwithJWT/t0022Go/internal/types"
 
-	"github.com/sharin-sushi/0022loginwithJWT/t0016Go/internal/utility"
+	"github.com/sharin-sushi/0022loginwithJWT/t0022Go/internal/utility"
 )
 
 // var all types.AllData

@@ -9,9 +9,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/cors"
 
-	"github.com/sharin-sushi/0022loginwithJWT/internal/controller/postrequest"
-	"github.com/sharin-sushi/0022loginwithJWT/internal/crud"
-	"github.com/sharin-sushi/0022loginwithJWT/internal/utility"
+	"github.com/sharin-sushi/0022loginwithJWT/t0022Go/internal/controller/postrequest"
+	"github.com/sharin-sushi/0022loginwithJWT/t0022Go/internal/crud"
+	"github.com/sharin-sushi/0022loginwithJWT/t0022Go/internal/utility"
 )
 
 //init at /internal/utility/database.go

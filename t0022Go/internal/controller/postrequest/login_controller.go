@@ -10,8 +10,8 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 
-	"github.com/sharin-sushi/0022loginwithJWT/internal/controller/model"
-	"github.com/sharin-sushi/0022loginwithJWT/internal/types"
+	"github.com/sharin-sushi/0022loginwithJWT/t0022Go/internal/controller/model"
+	"github.com/sharin-sushi/0022loginwithJWT/t0022Go/internal/types"
 )
 
 // /signup
