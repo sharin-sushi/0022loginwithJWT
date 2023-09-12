@@ -11,7 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/sharin-sushi/0022loginwithJWT/t0022Go/internal/controller/model"
-	"github.com/sharin-sushi/0022loginwithJWT/t0022Go/internal/controller/postrequest"
 	"github.com/sharin-sushi/0022loginwithJWT/t0022Go/internal/types"
 )
 
@@ -107,7 +106,12 @@ func PostLogin(c *gin.Context) {
 	}
 	fmt.Printf("DBから取得した情報=%+v \n ", member) //%vでも%sでも L1[GIN]
 
-	jwtToken := postrequest.GenerateToken(member.MemberId)
+	jwtToken, err := GenerateToken(member.MemberId)
+	if err != nil {
+		fmt.Print("トークンの生成に失敗しました。")
+		c.Redirect(301, "/login")
+		return
+	}
 
 	// sessionID := generateSessionID() →代わりにJWTtokenを使用
 	// sessionManage(c, *member)
