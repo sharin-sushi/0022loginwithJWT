@@ -22,9 +22,6 @@ func PostSignup(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	//r.BodyがHTTPリクエストのボディを参照し、&userinfoに格納
-	fmt.Printf("r.Bodyの処理完了し、userinfo=%v", userinfo)
-	c.JSON(http.StatusOK, gin.H{"str": json.FieldStr, "int": json.FieldInt, "bool": json.FieldBool})
 
 	// GPTより、
 	// func SomeHandler(c *gin.Context) {
