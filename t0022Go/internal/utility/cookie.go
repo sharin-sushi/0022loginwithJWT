@@ -14,12 +14,10 @@ import (
 
 func GetCookie(c *gin.Context) {
 	cookie, err := c.Cookie("shariSiteSession") //最初"gin_cookie"だった
-
 	if err != nil {
 		cookie = "NotSet"
 		c.SetCookie("shariSiteSession", "test", 3600, "/", "localhost", false, true)
 	}
-
 	fmt.Printf("Cookie value: %s \n", cookie)
 }
 

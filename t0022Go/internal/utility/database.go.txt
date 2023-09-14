@@ -17,6 +17,10 @@ import (
 // var DbGo *sql.DB
 var Db *gorm.DB
 
+type Handler struct {
+	DB *gorm.DB
+}
+
 // init packageがimportされたときに１度だけ自動で呼び出される
 func init() {
 	user := os.Getenv("MYSQL_USER")
