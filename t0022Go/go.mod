@@ -5,6 +5,11 @@ go 1.18
 require github.com/gin-contrib/sessions v0.0.5
 
 require (
+	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
+	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible // direct
+)
+
+require (
 	github.com/bytedance/sonic v1.10.1 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d // indirect
 	github.com/chenzhuoyu/iasm v0.9.0 // indirect

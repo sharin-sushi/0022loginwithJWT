@@ -10,7 +10,6 @@ import (
 	"github.com/rs/cors"
 
 	"github.com/sharin-sushi/0022loginwithJWT/t0022Go/internal/controller/postrequest"
-	"github.com/sharin-sushi/0022loginwithJWT/t0022Go/internal/crud"
 	"github.com/sharin-sushi/0022loginwithJWT/t0022Go/internal/utility"
 )
 
@@ -19,17 +18,17 @@ import (
 func main() {
 	r := gin.Default()
 
-	//配信者
-	r.GET("/", crud.GetAllStreamers)
-	r.POST("/", crud.PostStreamer)
-	r.PUT("/", crud.PutStreamer)
-	r.DELETE("/", crud.DeletetStreamer)
+	// //配信者
+	// r.GET("/", crud.GetAllStreamers)
+	// r.POST("/", crud.PostStreamer)
+	// r.PUT("/", crud.PutStreamer)
+	// r.DELETE("/", crud.DeletetStreamer)
 
-	//動画
-	r.GET("/movie", crud.ReadMovies) //未作成
+	// //動画
+	// r.GET("/movie", crud.ReadMovies) //未作成
 
-	//歌
-	r.GET("/sing", crud.ReadSings)
+	// //歌
+	// r.GET("/sing", crud.ReadSings)
 
 	//https://qiita.com/koshi_an/items/12da955a1823b7f3e178より
 	store := cookie.NewStore([]byte("OimoMochiMochIimoMochiOimo20000530"), []byte("sora4mama1997087")) //byteのスライスに変換することで値を変更できるらしい
@@ -38,9 +37,15 @@ func main() {
 	//↑どうなってるのか謎。
 
 	//ログイン、サインナップ、ログアウト ※ブラウザでは"/"にリンク有り
-	r.POST("/signup", postrequest.PostSignup)
-	r.POST("/login", postrequest.PostLogin)
-	r.POST("/logout", postrequest.PostLogout) //未作成
+	r.POST("/signup", postrequest.PostSignUp)
+	r.POST("/login", postrequest.PostLogIn)
+	r.POST("/signup2", utility.CalltoSignUpHandler)
+	r.POST("/login2", utility.CalltoLogInHandler)
+
+	r.POST("/logout", postrequest.PostLogout)  //未作成
+	r.POST("/logout2", postrequest.PostLogout) //未作成
+
+	// r.POST("/logout", utility.LeaveMember) //退会　作るの最後で良き
 
 	// 　　/mypage/~ をグループ化→/maypageとその下層へアクセスしたとき全てに適応　→１つなら要らか？
 	//　　 ("~")　にアクセスしたときにセッション確認し強制で{}のページへ遷移
