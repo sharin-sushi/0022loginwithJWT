@@ -100,7 +100,15 @@ func (m *Member) Validate() error {
 func FindUserByEmail(db *gorm.DB, email string) (Member, error) {
 	var user Member
 	result := db.Where("email = ?", email).First(&user)
-	fmt.Printf("%v \n", user)
+	fmt.Printf("Emailで取得したuser= %v \n", user)
+	return user, result.Error
+}
+
+func FindUserByMemberId(db *gorm.DB, memberId string) (Member, error) {
+	var user Member
+	fmt.Printf("FindUserByMemberIdで受け取ったmemberId= %v \n", memberId)
+	result := db.Where("member_id = ?", memberId).First(&user)
+	fmt.Printf("Idで取得したuser= %v \n", user)
 	return user, result.Error
 }
 

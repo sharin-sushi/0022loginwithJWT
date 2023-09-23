@@ -1,6 +1,13 @@
+私は【目的】がやりたくて
+【予想結果】になると思い
+【やったこと】を試しました。
+しかし、【実際の結果】となってしまいました。
+========================================
 1. Next.js導入
     cd 
     npx create-next-app
+    npm install js-cookie
+    react-hook-form
 
 
 2. githubでprodubt作成
@@ -18,6 +25,7 @@
     go get -u gorm.io/gorm
     go get -u gorm.io/driver/sqlite
     go get github.com/gin-contrib/sessions
+    go get "github.com/golang-jwt/jwt"
     github.com/go-ozzo/ozzo-validation
     github.com/go-ozzo/ozzo-validation/is 
      

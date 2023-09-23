@@ -1,16 +1,22 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/sharin-sushi/0022loginwithJWT/t0022Go/internal/utility"
+	"github.com/sharin-sushi/0022loginwithJWT/t0022Go/internal/utility/token"
 )
 
 func AuthMiddleware(c *gin.Context) {
-	tokenString, err := c.Cookie("token")
+	fmt.Printf("middleware中 \n")
+
+	tokenString, err := c.Cookie("auth-token")
+	fmt.Printf("tokenString=%v \n", tokenString)
+
 	if err != nil {
+		fmt.Printf("err=%v \n", err)
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "Unauthorized",
 		})
@@ -18,7 +24,8 @@ func AuthMiddleware(c *gin.Context) {
 		return
 	}
 
-	token, err := utility.ParseToken(tokenString)
+	token, err := token.ParseToken(tokenString) //tokenどうするの？
+	fmt.Printf("token=%v \n", token)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "Invalid token",
@@ -27,5 +34,6 @@ func AuthMiddleware(c *gin.Context) {
 		return
 	}
 
+	fmt.Printf("解析したauth-token= %v \n", token)
 	c.Next()
 }

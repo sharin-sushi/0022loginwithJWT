@@ -12,8 +12,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/golang-jwt/jwt"
 	"github.com/sharin-sushi/0022loginwithJWT/t0022Go/internal/controller/crypto"
 	"github.com/sharin-sushi/0022loginwithJWT/t0022Go/internal/types"
+	"github.com/sharin-sushi/0022loginwithJWT/t0022Go/internal/utility/token"
+	"github.com/sharin-sushi/0022loginwithJWT/t0022Go/pkg/middleware"
+
+	// "github.com/sharin-sushi/0022loginwithJWT/t0022Go/pkg/middleware"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -26,7 +31,10 @@ type Handler struct {
 	DB *gorm.DB
 }
 
-// init packageがimportされたときに１度だけ自動で呼び出される
+func GetDB() *gorm.DB {
+	return Db
+}
+
 func init() {
 	user := os.Getenv("MYSQL_USER")
 	pw := os.Getenv("MYSQL_PASSWORD")
@@ -115,7 +123,7 @@ func (h *Handler) SignUpHandler(c *gin.Context) {
 	//ここまで動作確認ok
 
 	// Token発行　＝　JWTでいいのかな？
-	token, err := GenerateToken(newMember.MemberId)
+	token, err := token.GenerateToken(newMember.MemberId)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Failed to sign up",
@@ -124,8 +132,9 @@ func (h *Handler) SignUpHandler(c *gin.Context) {
 	}
 
 	// Cookieにトークンをセット
-	cookieMaxAge := 60 * 60
+	cookieMaxAge := 60 * 10 //10分 //12hにする
 	c.SetCookie("token", token, cookieMaxAge, "/", "localhost", false, true)
+
 	c.JSON(http.StatusOK, gin.H{
 		"memberId":   newMember.MemberId,
 		"memberName": newMember.MemberName,
@@ -167,7 +176,7 @@ func (h *Handler) LoginHandler(c *gin.Context) {
 	fmt.Printf("ChechkPassErr=%v \n", CheckPassErr)
 
 	// Token発行　＝　JWTでいいのかな？
-	token, err := GenerateToken(user.MemberId)
+	token, err := token.GenerateToken(user.MemberId)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Failed to sign up",
@@ -176,12 +185,122 @@ func (h *Handler) LoginHandler(c *gin.Context) {
 	}
 
 	// Cookieにトークンをセット
-	cookieMaxAge := 60 * 60
-	c.SetCookie("token", token, cookieMaxAge, "/", "localhost", false, true)
+	cookieMaxAge := 60 * 10
+	// c.SetCookie("token", token, cookieMaxAge, "/", "localhost", false, true)
+	// c.SetCookie("token", token, cookieMaxAge, "/", "", false, false)
+
+	cookie := &http.Cookie{
+		Name: "auth-token",
+		// Name:     "next-auth.session-token",
+		Value:    token,
+		Path:     "/",
+		Domain:   "localhost",
+		MaxAge:   cookieMaxAge,
+		HttpOnly: true,
+		Secure:   false, //httpsの環境ではtrueにすること。 trueではpostmanで不具合。
+		// SameSite: http.SameSiteStrictMode,	//Secure falseと併用でダメだった
+		SameSite: http.SameSiteNoneMode, //Secure falseと併用でダメだった
+		// SameSite: http.SameSiteLaxMode, //Secure falseと併用でダメだった
+		// 	SameSite: http.SameSiteLaxMode, //c.SetCookieでは設定不可かも。デフォだとLax。Strict, Lax, Noneの3択。
+
+	}
+	http.SetCookie(c.Writer, cookie)
 
 	c.JSON(http.StatusOK, gin.H{
-		"message":    "Successfully logged in",
+		"message":    "Successfully loggined",
 		"memberId":   user.MemberId,
 		"memberName": user.MemberName,
 	})
 }
+
+// mainにてmiddleware管理
+func CallGetMemberProfile(r *gin.Engine) {
+	h := &Handler{
+		DB: GetDB(),
+	}
+
+	fmt.Printf("middleware直前 \n")
+	users := r.Group("/users")
+	users.Use(middleware.AuthMiddleware) // middlewareを設定
+	{
+		users.GET("/profile", h.GetMemberProfile) // ユーザー一覧を取得
+	}
+
+	cud := r.Group("/cud") //CRUDのread以外
+	cud.Use(middleware.AuthMiddleware)
+	{
+		users.POST("create", h.GetMemberProfile) // ユーザー一覧を取得
+		users.POST("delete", h.GetMemberProfile) // ユーザー一覧を取得
+		users.POST("update", h.GetMemberProfile) // ユーザー一覧を取得
+	}
+}
+
+// /users/profile
+func (h *Handler) GetMemberProfile(c *gin.Context) {
+	tokenString, _ := c.Cookie("auth-token")
+	// tokenString, _ := c.Cookie("next-auth.session-token")　不要
+
+	fmt.Printf("middleware越えたtokenString= %v \n", tokenString)
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		return []byte(os.Getenv("SECRET_KEY")), nil
+	})
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+		return
+	}
+	fmt.Printf("token= %v \n", token)
+
+	var memberId string
+	if claims, ok := token.Claims.(jwt.MapClaims); ok {
+		memberId = claims["user_id"].(string)
+		fmt.Printf("memberId= %v \n", memberId)
+		if !ok {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "member_id not found in token"})
+			return
+		}
+	} else {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+		return
+	}
+	fmt.Printf("claims後のスコープ外のmemberId= %v \n", memberId)
+
+	memberInfo, err := types.FindUserByMemberId(h.DB, memberId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error fetching member info"}) //これが表示された
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"MemberId":   memberInfo.MemberId,
+		"MemberName": memberInfo.MemberName,
+		"CreatedAt":  memberInfo.CreatedAt,
+		"Email":      "secret",
+		"Password":   "secret",
+		"message":    "get urself infomation",
+	})
+}
+
+// ログアウト
+func LogoutHandler(c *gin.Context) {
+	c.SetCookie("token", "none", -1, "/", "localhost", false, true)
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Successfully Logout",
+	})
+}
+
+// var signUpInput types.EntryMember
+// var signUpInput types.EntryMember
+// tokenString, err := c.Cookie("token")
+
+// memberInfo := Member{
+// 	MemberName: m.MemberName,
+// 	Email:      m.Email,
+// 	Password:   crypto.PasswordEncryptNoBackErr(m.Password),
+// }
+// signUpInput =
+// memberInfo, _ = types.FindUserByMemberId(h.DB, signUpInput.MemberId) //メアドが未使用ならnil
+
+// cookieのtokenからIdを取得
+// idからmemberInfo Member型を取得
+// responsにぶちこんで返す
