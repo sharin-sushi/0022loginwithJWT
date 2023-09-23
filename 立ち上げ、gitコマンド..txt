@@ -1,6 +1,13 @@
+私は【目的】がやりたくて
+【予想結果】になると思い
+【やったこと】を試しました。
+しかし、【実際の結果】となってしまいました。
+========================================
 1. Next.js導入
     cd 
     npx create-next-app
+    npm install js-cookie
+    react-hook-form
 
 
 2. githubでprodubt作成
@@ -17,7 +24,10 @@
     go get -u github.com/gocolly/colly/v2
     go get -u gorm.io/gorm
     go get -u gorm.io/driver/sqlite
-     go get github.com/gin-contrib/sessions
+    go get github.com/gin-contrib/sessions
+    go get "github.com/golang-jwt/jwt"
+    github.com/go-ozzo/ozzo-validation
+    github.com/go-ozzo/ozzo-validation/is 
      
 
     go mod tidy
@@ -36,6 +46,7 @@ go mod init git@github.com:sharin-sushi/0012GoNext.git
     git remote add origin "https://github.com/sharin-sushi/0012GoNext.git"
     　//HTTPにすること。間違えたら　git remote remove origin　でやり直し
     git push -u origin main
+    
 
 5. **,goへimport
 go get "github.com/sharin-sushi/0010/test/internal/article"
@@ -87,3 +98,4 @@ go get "github.com/sharin-sushi/0010/test/internal/article"
     git checkout -c  (ブランチＢ)
     git merge (ブランチＡ)
 
+#1 git push origin "issue/1-checkGoServer"

@@ -15,9 +15,9 @@ import (
 )
 
 // /signup
-func PostSignup(c *gin.Context) {
+func PostSignUp(c *gin.Context) {
 	// var userinfo types.User
-	var json types.UserInfoFromFront
+	var json types.EntryMember
 	if err := c.ShouldBindJSON(&json); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -78,7 +78,7 @@ func PostSignup(c *gin.Context) {
 
 // "/login"
 
-func PostLogin(c *gin.Context) {
+func PostLogIn(c *gin.Context) {
 	type test struct {
 		csrfToken string
 		types.Member
