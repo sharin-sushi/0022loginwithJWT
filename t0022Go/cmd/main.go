@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"net/http"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/rs/cors"
+
+	// "github.com/rs/cors"
 
 	"github.com/sharin-sushi/0022loginwithJWT/t0022Go/internal/controller/postrequest"
 	"github.com/sharin-sushi/0022loginwithJWT/t0022Go/internal/utility"
@@ -55,27 +55,29 @@ func main() {
 	//		↑違ったかも
 	//	/maypage/{}で指定したpath にアクションがあった際にUse(sessionChechk())を実行する。
 	// r.Group("/mypage").Use(sessionCheck())
-	{
-		// r.GET("/", mypage.Mypage) //未作成　マイページにしたい
-	}
 
-	//Cookie　削除予定
-	// r.GET("/cookie", utility.GetCookie)
+	// r.GET("/", mypage.Mypage) //未作成　マイページにしたい
 
-	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000"},
+	// // CORS 対応
+	// config := cors.DefaultConfig()
+	// config.AllowOrigins = []string{"http://sample.com"}
+	// r.Use(cors.New(config))
+
+	r.Use(cors.New(cors.Config{
+		// アクセス許可するオリジン
+		AllowOrigins: []string{"https://localhost"},
+		// アクセス許可するHTTPメソッド
+		AllowMethods: []string{"POST", "GET", "PUT", "DELETE"},
+		// 許可するHTTPリクエストヘッダ
+		AllowHeaders: []string{"Content-Type"},
+		// cookieなどの情報を許可するかどうか
 		AllowCredentials: true,
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
-	})
-	handler := c.Handler(r)
+		// // preflightリクエストの結果をキャッシュする時間
+		// MaxAge: 24 * time.Hour,
+	}))
 
-	// handler := cors.Default().Handler(r)
-
-	if err := http.ListenAndServe(":8080", handler); err != nil {
-		log.Fatal("ListenAndServe:", err)
-	}
-
-	r.Run(":8080")
+	// httpsサーバー起動
+	r.RunTLS(":8080", "../key/server.pem", "../key/server_unencrypted.key")
 }
 
 type SessionInfo struct {
@@ -103,3 +105,18 @@ type SessionInfo struct {
 // 		log.Println("ログインチェック終わり")
 // 	}
 // }
+
+// ****memo****
+// httpサーバー起動, CORS設定
+// c := cors.New(cors.Options{
+// 	AllowedOrigins:   []string{"http://localhost:3000"},
+// 	AllowCredentials: true,
+// 	AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
+// })
+// handler := c.Handler(r)
+
+// handler := cors.Default().Handler(r)
+// r.Run(":8080")
+
+//Cookie　削除予定
+// r.GET("/cookie", utility.GetCookie)

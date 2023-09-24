@@ -197,7 +197,7 @@ func (h *Handler) LoginHandler(c *gin.Context) {
 		Domain:   "localhost",
 		MaxAge:   cookieMaxAge,
 		HttpOnly: true,
-		Secure:   false, //httpsの環境ではtrueにすること。 trueではpostmanで不具合。
+		Secure:   true, //httpsの環境ではtrueにすること。
 		// SameSite: http.SameSiteStrictMode,	//Secure falseと併用でダメだった
 		SameSite: http.SameSiteNoneMode, //Secure falseと併用でダメだった
 		// SameSite: http.SameSiteLaxMode, //Secure falseと併用でダメだった
