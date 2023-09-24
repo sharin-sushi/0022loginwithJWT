@@ -65,7 +65,7 @@ func main() {
 
 	r.Use(cors.New(cors.Config{
 		// アクセス許可するオリジン
-		AllowOrigins: []string{"http://localhost"},
+		AllowOrigins: []string{"https://localhost"},
 		// アクセス許可するHTTPメソッド
 		AllowMethods: []string{"POST", "GET", "PUT", "DELETE"},
 		// 許可するHTTPリクエストヘッダ

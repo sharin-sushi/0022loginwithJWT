@@ -53,7 +53,7 @@ export const GetServerSideProps = async (context: { req: { headers: { cookie: an
     cache: "no-store",
     credentials: 'include'
   };
-  const res = await fetch('http://localhost:8080/users/profile', options);
+  const res = await fetch('https://localhost:8080/users/profile', options);
   const data = await res.json();
 
   return {
