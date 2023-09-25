@@ -24,7 +24,7 @@ func AuthMiddleware(c *gin.Context) {
 		return
 	}
 
-	token, err := token.ParseToken(tokenString) //tokenどうするの？
+	token, err := token.ParseToken(tokenString) //tokenどうするの？err==nilならokってこと？
 	fmt.Printf("token=%v \n", token)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{

@@ -205,6 +205,7 @@ func (h *Handler) LoginHandler(c *gin.Context) {
 
 	}
 	http.SetCookie(c.Writer, cookie)
+	fmt.Printf("発行したcookie= %v /n", cookie)
 
 	c.JSON(http.StatusOK, gin.H{
 		"message":    "Successfully loggined",
@@ -282,7 +283,7 @@ func (h *Handler) GetMemberProfile(c *gin.Context) {
 
 // ログアウト
 func LogoutHandler(c *gin.Context) {
-	c.SetCookie("token", "none", -1, "/", "localhost", false, true)
+	c.SetCookie("auth-token", "none", -1, "/", "localhost", false, true)
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Successfully Logout",

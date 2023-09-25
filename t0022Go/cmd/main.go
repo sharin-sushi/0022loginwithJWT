@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -9,6 +10,7 @@ import (
 	// "github.com/rs/cors"
 
 	"github.com/sharin-sushi/0022loginwithJWT/t0022Go/internal/controller/postrequest"
+	"github.com/sharin-sushi/0022loginwithJWT/t0022Go/internal/types"
 	"github.com/sharin-sushi/0022loginwithJWT/t0022Go/internal/utility"
 )
 
@@ -17,8 +19,24 @@ import (
 func main() {
 	r := gin.Default()
 
+	r.Use(cors.New(cors.Config{
+		// アクセス許可するオリジン
+		AllowOrigins: []string{"https://localhost:3000"},
+		// AllowOrigins: []string{"*"}, //ワイルドカードだが、クライアント側がcredenrials incliudeでは許されてない。
+
+		// アクセス許可するHTTPメソッド
+		AllowMethods: []string{"POST", "GET", "PUT", "DELETE"},
+		// 許可するHTTPリクエストヘッダ
+		// AllowHeaders: []string{"Content-Type"},
+		AllowHeaders: []string{"Origin", "Content-Length", "Content-Type", "Cookie"},
+		// cookieなどの情報を許可するかどうか
+		AllowCredentials: true,
+		// // preflightリクエストの結果をキャッシュする時間
+		// MaxAge: 24 * time.Hour,
+	}))
+
 	// //配信者
-	// r.GET("/", crud.GetAllStreamers)
+	r.GET("/", GetAllStreamers)
 	// r.POST("/", crud.PostStreamer)
 	// r.PUT("/", crud.PutStreamer)
 	// r.DELETE("/", crud.DeletetStreamer)
@@ -46,7 +64,7 @@ func main() {
 
 	r.POST("/signup2", utility.CalltoSignUpHandler)
 	r.POST("/login2", utility.CalltoLogInHandler)
-	r.GET("/logout2", utility.LogoutHandler)
+	r.POST("/logout2", utility.LogoutHandler)
 
 	// r.POST("/logout", utility.LeaveMember) //退会　作るの最後で良き
 
@@ -63,21 +81,8 @@ func main() {
 	// config.AllowOrigins = []string{"http://sample.com"}
 	// r.Use(cors.New(config))
 
-	r.Use(cors.New(cors.Config{
-		// アクセス許可するオリジン
-		AllowOrigins: []string{"https://localhost"},
-		// アクセス許可するHTTPメソッド
-		AllowMethods: []string{"POST", "GET", "PUT", "DELETE"},
-		// 許可するHTTPリクエストヘッダ
-		AllowHeaders: []string{"Content-Type"},
-		// cookieなどの情報を許可するかどうか
-		AllowCredentials: true,
-		// // preflightリクエストの結果をキャッシュする時間
-		// MaxAge: 24 * time.Hour,
-	}))
-
 	// httpsサーバー起動
-	r.RunTLS(":8080", "../key/server.pem", "../key/server_unencrypted.key")
+	r.RunTLS(":8080", "../../key/server.pem", "../../key/server_unencrypted.key")
 }
 
 type SessionInfo struct {
@@ -120,3 +125,42 @@ type SessionInfo struct {
 
 //Cookie　削除予定
 // r.GET("/cookie", utility.GetCookie)
+
+var streamer types.Streamer
+var streamers []types.Streamer
+var stsmos []*types.StreamerMovie //Scan()するからポインタ？
+
+func GetAllStreamers(c *gin.Context) {
+	/////streamers 全件取得
+	resultSts := utility.Db.Find(&streamers)
+	if resultSts.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"resultStsのerror": resultSts.Error.Error()})
+		return
+	}
+
+	fmt.Printf("全件取得streamers=%v \n", streamers)
+
+	////streamers, movies joinして全件取 ReadMoviesに同じ
+	resultStsmo := utility.Db.Model(&streamers).Select("streamers.streamer_id, streamers.streamer_name, m.movie_id, m.movie_url, m.movie_title").Joins("LEFT JOIN movies m USING(streamer_id)").Scan(&stsmos)
+	// SELECT ~略~ FROM streamers LEFT JOIN movies m USING streamer_id
+	if resultStsmo.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"resultStsmoのerror": resultStsmo.Error.Error()})
+		return
+	}
+	// for resultStsmo.Next() {
+	// 	stsmos.Scan(&stsmo.Streamer.StreamerId, &stsmo.Streamer.StreamerName, &stsmo.Streamer.NameKana, &stsmo.Movie.MovieId, &stsmo.Movie.MovieUrl, &stsmo.Movie.MovieTitle)
+
+	// }
+	fmt.Printf("stsmos=%v, \n streamers=%v \n", stsmos, streamers)
+
+	for _, stsmo := range stsmos {
+		fmt.Printf("%+v\n", *stsmo)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"streamers":                  streamers,
+		"streamers_and_moviesmovies": stsmos,
+	})
+}
+
+// SELECT streamers.streamer_id, streamers.streamer_name, m.movie_id, m.movie_url, m.movie_title FROM streamers LEFT JOIN movies m USING(streamer_id)
