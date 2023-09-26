@@ -3,7 +3,7 @@ import Cookie from 'js-cookie';
 
   // Cookieにtokenが存在していれば、ログイン中とみなす
 const isLoggedIn = (): boolean => {
-  const token = Cookie.get('token');
+  const token = Cookie.get('auth-token');
   console.log("token=", token, "\n")
   return !!token;
 };

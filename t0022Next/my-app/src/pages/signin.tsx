@@ -1,7 +1,6 @@
 // const Signin: WithGetAccessControl<VFC> = (props) => {
 //     return
 //   }
-  
 //   Signin.getAccessControl = () => {
 //     return isLoggedIn() ? { type: 'replace', destination: '/mypage' } : null
 //   }

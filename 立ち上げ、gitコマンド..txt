@@ -7,7 +7,8 @@
     cd 
     npx create-next-app
     npm install js-cookie
-    react-hook-form
+    npm install react-hook-form
+    npm install axios　//オレオレ証明書絡みで試用。本番環境ではおそらく不要。
 
 
 2. githubでprodubt作成

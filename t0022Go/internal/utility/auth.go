@@ -132,7 +132,7 @@ func (h *Handler) SignUpHandler(c *gin.Context) {
 	}
 
 	// Cookieにトークンをセット
-	cookieMaxAge := 60 * 10 //10分 //12hにする
+	cookieMaxAge := 60 * 60 * 12 //12h
 	c.SetCookie("token", token, cookieMaxAge, "/", "localhost", false, true)
 
 	c.JSON(http.StatusOK, gin.H{
@@ -185,7 +185,7 @@ func (h *Handler) LoginHandler(c *gin.Context) {
 	}
 
 	// Cookieにトークンをセット
-	cookieMaxAge := 60 * 10
+	cookieMaxAge := 60 * 60 * 12
 	// c.SetCookie("token", token, cookieMaxAge, "/", "localhost", false, true)
 	// c.SetCookie("token", token, cookieMaxAge, "/", "", false, false)
 

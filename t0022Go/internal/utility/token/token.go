@@ -14,7 +14,7 @@ func GenerateToken(MemberId string) (string, error) {
 	// if err != nil {
 	// 	return "", err
 	// }
-	tokenLifeTime := 60 * 10 // 12hにする
+	tokenLifeTime := 60 * 60 * 12 // 12hにする
 
 	claims := jwt.MapClaims{
 		"user_id": MemberId,
