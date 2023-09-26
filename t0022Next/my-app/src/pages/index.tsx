@@ -7,26 +7,27 @@ import type { AllData, Streamer, StreamerMovie } from '../types/singdata'; //typ
 import { useRouter } from 'next/router';
 import https from 'https';
 import axios from 'axios';
+import { AxiosRequestConfig } from 'axios';
+
 
 //分割代入？
 // 型注釈IndexPage(posts: Post)
 const AllDatePage = ({ posts }) =>  {
-    console.log("test2")
-
     // data1というステートを定義。streamerの配列を持つ。
     // setData1はステートを更新する関数。
   const [streamers, setData1] = useState<Streamer[]>();
-  const [streamerstoMovies, setData2] = useState<StreamerMovie[]>();
+  const [movies, setData2] = useState<StreamerMovie[]>();
   const router = useRouter();
 
   useEffect(() => {
     if (posts) {
         setData1(posts.streamers);
-        setData2(posts.streamerstoMovies);
+        setData2(posts.streamers_and_moviesmovies);
 
     }
 }, [posts]);
-console.log("test3")
+console.log("posts.streamers=",posts.streamers)
+console.log("posts.streamers_and_moviesmovies=",posts.streamers_and_moviesmovies)
 
   return (
     <div>
@@ -62,28 +63,29 @@ console.log("test3")
             <td>紹介動画</td>
             <td>リンク</td>
             <td>リンク</td>
+        {}
             <td>編集</td>
           </tr>
         </thead>
     
         <tbody>
-        {streamers && streamers.map((Data1, index) => (
+        {streamers && streamers.map((streamers, index) => (
         <tr key={index}>
-         <td>{Data1.StreamerId}</td>
-         <td>{Data1.StreamerName}</td>
-         <td>{Data1.NameKana}</td>
+         <td>{streamers.StreamerId}</td>
+         <td>{streamers.StreamerName}</td>
+         <td>{streamers.NameKana}</td>
        
-              {Data1.SelfIntroUrl ? (
-          <td><Link href={Data1.SelfIntroUrl}>youtubeへ</Link></td>
+              {streamers.SelfIntroUrl ? (
+          <td><Link href={streamers.SelfIntroUrl}>youtubeへ</Link></td>
         ) : (
           <td>未登録</td>
         )}
 
-          <td><Link href={`/movie?streamer_id=${Data1.StreamerId}`}>歌枠</Link></td>
-          <td><Link href={`/sing?streamer_id=${Data1.StreamerId}`}>歌</Link></td>
+          <td><Link href={`/movie?streamer_id=${streamers.StreamerId}`}>歌枠</Link></td>
+          <td><Link href={`/sing?streamer_id=${streamers.StreamerId}`}>歌</Link></td>
         
               {/* http://localhost:3000/show?Unique_id=1　になった */}
-              <td><Link href={`/edit?Unique_id=${Data1.StreamerId}`}>編集</Link></td>
+              <td><Link href={`/edit?Unique_id=${streamers.StreamerId}`}>編集</Link></td>
             </tr>
             ))}
         </tbody>
@@ -103,15 +105,15 @@ console.log("test3")
           </tr>
         </thead>
         <tbody>
-          {streamerstoMovies && streamerstoMovies.map((item2, index) => (
+          {movies && movies.map((movies, index) => (
             <tr key={index}>
-              <td>{item2.StreamerName}</td>
-              <td>{item2.MovieId}</td>        
-              <td><Link href={`/sing?movie_url=${item2.MovieUrl}`}>{item2.MovieTitle}</Link></td>
-              <td>{item2.MovieUrl}</td>
+              <td>{movies.StreamerName}</td>
+              <td>{movies.MovieId}</td>        
+              <td><Link href={`/sing?movie_url=${movies.MovieUrl}`}>{movies.MovieTitle}</Link></td>
+              <td>{movies.MovieUrl}</td>
  
               {/* http://localhost:3000/show?Unique_id=1　になった */}
-              <td><Link href={`/posts/${item2.StreamerId}`}>編集</Link></td>
+              <td><Link href={`/posts/${movies.StreamerId}`}>編集</Link></td>
             </tr>
             ))}
         </tbody>
@@ -121,7 +123,7 @@ console.log("test3")
 
 //   オレオレ証明書対応のために、証明書を無視してる。
 // 本番環境では変更が必要。
-  export async function getServerSideProps() {
+  export async function getServerSideProps(context: { req: { headers: { cookie: any; }; }; }) {
     const httpsAgent = new https.Agent({
         rejectUnauthorized: false
     });
@@ -137,17 +139,19 @@ console.log("test3")
     }
 
     // console.log("resData: ", resData)
-    console.log("test1")
-
+    console.log("resData=", resData) //この時点では動画情報持ってる
+    
     return {
         props: {
-            posts: resData
+            posts: resData, 
+            // signin: "true"
         }
     };
 }
   
   export default AllDatePage;
   
+
 
 //   **** memo ****
 
